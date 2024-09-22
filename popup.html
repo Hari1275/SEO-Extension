@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Advanced SEO Analyzer</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        width: 400px;
+        font-family: 'Roboto', sans-serif;
+        padding: 20px;
+        background-color: #2c3e50;
+        color: #ecf0f1;
+        margin: 0;
+      }
+      h1 {
+        font-size: 24px;
+        color: #3498db;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .seo-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+      }
+      .seo-item {
+        background-color: #34495e;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+      }
+      .seo-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+      }
+      .label {
+        font-weight: bold;
+        color: #bdc3c7;
+        display: block;
+        margin-bottom: 5px;
+      }
+      .value {
+        font-size: 18px;
+      }
+      .good { color: #2ecc71; }
+      .warning { color: #f39c12; }
+      .bad { color: #e74c3c; }
+      .color-legend {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+        background-color: #34495e;
+        padding: 10px;
+        border-radius: 8px;
+      }
+      .color-item {
+        display: flex;
+        align-items: center;
+        margin: 0 10px;
+      }
+      .color-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 5px;
+      }
+      .powered-by {
+        text-align: center;
+        font-size: 12px;
+        margin-top: 20px;
+        color: #95a5a6;
+      }
+      .content-suggestions {
+        background-color: #2980b9;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 20px;
+      }
+      .keywords-list, .missed-images {
+        background-color: #34495e;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+      }
+      .keyword-item {
+        background-color: #3498db;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        margin: 2px;
+        display: inline-block;
+      }
+      .missed-image-item {
+        font-size: 12px;
+        margin-bottom: 10px;
+        background-color: #2c3e50;
+        border-radius: 4px;
+        padding: 8px;
+      }
+      .missed-image-url {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+      }
+      .missed-image-url span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 250px;
+      }
+      .missed-image-dimensions {
+        font-size: 11px;
+        color: #bdc3c7;
+      }
+      .btn {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 3px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+        margin-left: 5px;
+      }
+      .btn:hover {
+        background-color: #2980b9;
+      }
+      .section {
+        background-color: #34495e;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        overflow: hidden;
+      }
+      .section-header {
+        background-color: #2c3e50;
+        padding: 10px 15px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .section-content {
+        padding: 15px;
+        display: none;
+      }
+      .section-content.active {
+        display: block;
+      }
+      #keywordsChart {
+        width: 100%;
+        height: 200px;
+      }
+      #exportBtn {
+        background-color: #27ae60;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 15px;
+        width: 100%;
+      }
+      #exportBtn:hover {
+        background-color: #2ecc71;
+      }
+      .readability-score {
+        background-color: #2c3e50;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 15px;
+      }
+      .readability-score h4 {
+        margin-top: 0;
+        color: #3498db;
+      }
+    </style>
+    <script src="chart.min.js"></script>
+    <script src="jszip.min.js"></script>
+    <script src="xlsx.full.min.js"></script>
+    <!-- <script src="popup.js"></script> -->
+  </head>
+  <body>
+    <h1><i class="fas fa-chart-line icon"></i>SEO Analysis</h1>
+    <div class="color-legend">
+      <div class="color-item">
+        <div class="color-dot" style="background-color: #2ecc71;"></div>
+        <span class="good">Good</span>
+      </div>
+      <div class="color-item">
+        <div class="color-dot" style="background-color: #f39c12;"></div>
+        <span class="warning">Warning</span>
+      </div>
+      <div class="color-item">
+        <div class="color-dot" style="background-color: #e74c3c;"></div>
+        <span class="bad">Bad</span>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-header">
+        <h3><i class="fas fa-list icon"></i>SEO Results</h3>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="section-content" id="seoResults"></div>
+    </div>
+    <div class="section">
+      <div class="section-header">
+        <h3><i class="fas fa-tags icon"></i>Top Keywords</h3>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="section-content" id="keywordsList">
+        <canvas id="keywordsChart"></canvas>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-header">
+        <h3><i class="fas fa-image icon"></i>Images Missing Alt Text</h3>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="section-content" id="missedImages"></div>
+    </div>
+    <div class="section">
+      <div class="section-header">
+        <h3>
+          <i class="fas fa-lightbulb icon"></i>Content Improvement Suggestions
+        </h3>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="section-content" id="contentSuggestions"></div>
+    </div>
+    <button id="exportBtn">
+      <i class="fas fa-download icon"></i> Export Results
+    </button>
+    <div class="powered-by">Powered by Hari</div>
+    <script src="popup.js"></script>
+  </body>
+</html>
